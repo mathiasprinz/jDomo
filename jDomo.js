@@ -67,6 +67,25 @@
   
   ///////////////////
 
+  function stringIsEvent ( str ) {
+    var findEvent = str.split(' ');
+    var l = findEvent.length;
+    var isEvent = true;
+    var e;
+
+    while ( l-- ) {
+      e = findEvent[ l ].split('.')[0]
+      if (  document[ 'on' + e ] === undefined && jQuery.event.special[ e ] === undefined ) { 
+        isEvent = false;
+        break;
+      }
+    }
+    
+    return isEvent;
+  }
+
+  ///////////////////
+
   function filterArgs () {
     var setup = { type: 'click', childNodes: [], callbacks: [], body: [], data: {}, triggerOnce: false };
     var l = arguments.length;
@@ -105,16 +124,13 @@
 
       if ( typeof arguments[ i ] === 'string' ) {
         
-        findEvent = arguments[ i ].match( /(^.*)[ |\.]|(^.*)$/ );
-        if (  findEvent[ 2 ] ) findEvent[ 1 ] = findEvent[ 2 ]; // not nice must find the time to get into regEx
-      
-        if ( findEvent === null || document[ 'on' + findEvent[ 1 ] ] === undefined && jQuery.event.special[ findEvent[ 1 ]  ] === undefined ) {
+        if ( ! stringIsEvent( arguments[ i ] ) ) {
           setup.childNodes.push( arguments[ i ] );
-          continue;
+           continue;
         }
       }
 
-      // calabcks
+      // callbacks
 
       if ( typeof arguments[ i ] === 'function'  ) {
 
@@ -139,7 +155,7 @@
       }
       
       // eventtype
-      
+
       setup.type = arguments[ i ];
     }
 
